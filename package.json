@@ -3,11 +3,31 @@
   "displayName": "Worktree Colors",
   "description": "Auto-assign colors to workspaces - git worktrees get related shades",
   "version": "0.1.0",
-  "publisher": "worktree-colors",
+  "publisher": "shravan",
   "license": "MIT",
+  "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/user/vscode-wt"
+    "url": "https://github.com/ShravanSunder/worktree-colors"
+  },
+  "homepage": "https://github.com/ShravanSunder/worktree-colors",
+  "bugs": {
+    "url": "https://github.com/ShravanSunder/worktree-colors/issues"
+  },
+  "keywords": [
+    "peacock",
+    "color",
+    "workspace",
+    "worktree",
+    "git",
+    "theme",
+    "titlebar",
+    "statusbar",
+    "window"
+  ],
+  "galleryBanner": {
+    "color": "#4a6b8a",
+    "theme": "dark"
   },
   "engines": {
     "vscode": "^1.85.0"

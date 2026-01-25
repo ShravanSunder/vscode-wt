@@ -162,20 +162,23 @@ function crc32(buffer) {
 	return crc ^ 0xffffffff;
 }
 
-let crc32Table = null;
-function getCRC32Table() {
-	if (crc32Table) return crc32Table;
-
-	crc32Table = new Uint32Array(256);
-	for (let i = 0; i < 256; i++) {
-		let c = i;
-		for (let j = 0; j < 8; j++) {
-			c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+const getCRC32Table = (() => {
+	let crc32Table;
+	return () => {
+		if (crc32Table) {
+			return crc32Table;
 		}
-		crc32Table[i] = c;
-	}
-	return crc32Table;
-}
+		crc32Table = new Uint32Array(256);
+		for (let i = 0; i < 256; i++) {
+			let c = i;
+			for (let j = 0; j < 8; j++) {
+				c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+			}
+			crc32Table[i] = c;
+		}
+		return crc32Table;
+	};
+})();
 
 // Generate and save icon
 const png = createPNG(SIZE, SIZE, R, G, B);

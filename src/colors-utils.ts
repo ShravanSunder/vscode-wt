@@ -74,7 +74,16 @@ export function hslToHex(h: number, s: number, l: number): string {
 }
 
 /**
+ * Linearize an sRGB color component for luminance calculation
+ */
+function linearize(c: number): number {
+	const s = c / 255;
+	return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+}
+
+/**
  * Get a contrasting foreground color (light or dark) based on background luminance
+ * Uses WCAG 2.0 relative luminance calculation for better accessibility
  */
 export function getContrastingForeground(hexColor: string): string {
 	const hex = hexColor.replace('#', '');
@@ -82,10 +91,11 @@ export function getContrastingForeground(hexColor: string): string {
 	const g = Number.parseInt(hex.substring(2, 4), 16);
 	const b = Number.parseInt(hex.substring(4, 6), 16);
 
-	// Relative luminance calculation
-	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+	// WCAG 2.0 relative luminance calculation
+	const luminance = 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
 
-	return luminance > 0.5 ? '#15202b' : '#e0e0e0';
+	// Threshold of 0.179 is where contrast against black and white is equal
+	return luminance > 0.179 ? '#15202b' : '#e0e0e0';
 }
 
 /**

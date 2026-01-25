@@ -1,0 +1,25 @@
+.vscode/**
+.vscode-test/**
+src/**
+node_modules/**
+.gitignore
+.github/**
+**/*.map
+**/*.ts
+tsconfig.json
+biome.json
+vitest.config.ts
+*.md
+!README.md
+scripts/**
+*.vsix
+
+# Exclude test files from out/
+out/**/*.test.js
+out/**/*.test.d.ts
+
+# But keep non-test .d.ts files
+!out/colors-utils.d.ts
+!out/colors.d.ts
+!out/extension.d.ts
+!out/git.d.ts

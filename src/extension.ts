@@ -79,23 +79,17 @@ async function resetWorktreeColors(): Promise<void> {
 
 export function activate(context: vscode.ExtensionContext): void {
 	// Register commands
-	const applyCommand = vscode.commands.registerCommand(
-		'worktreeColors.applyColor',
-		async () => {
-			const result = await applyWorktreeColors();
-			await vscode.window.showInformationMessage(result.message);
-		}
-	);
+	const applyCommand = vscode.commands.registerCommand('worktreeColors.applyColor', async () => {
+		const result = await applyWorktreeColors();
+		await vscode.window.showInformationMessage(result.message);
+	});
 
 	const resetCommand = vscode.commands.registerCommand(
 		'worktreeColors.resetColor',
 		resetWorktreeColors
 	);
 
-	const infoCommand = vscode.commands.registerCommand(
-		'worktreeColors.showInfo',
-		showWorktreeInfo
-	);
+	const infoCommand = vscode.commands.registerCommand('worktreeColors.showInfo', showWorktreeInfo);
 
 	context.subscriptions.push(applyCommand, resetCommand, infoCommand);
 

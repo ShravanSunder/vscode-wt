@@ -76,9 +76,9 @@ export function hslToHex(h: number, s: number, l: number): string {
  */
 export function getContrastingForeground(hexColor: string): string {
 	const hex = hexColor.replace('#', '');
-	const r = parseInt(hex.substring(0, 2), 16);
-	const g = parseInt(hex.substring(2, 4), 16);
-	const b = parseInt(hex.substring(4, 6), 16);
+	const r = Number.parseInt(hex.substring(0, 2), 16);
+	const g = Number.parseInt(hex.substring(2, 4), 16);
+	const b = Number.parseInt(hex.substring(4, 6), 16);
 
 	// Relative luminance calculation
 	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
@@ -168,8 +168,7 @@ export async function applyColors(baseColor: string, config: ColorConfig): Promi
 	const colors = buildColorCustomizations(baseColor, config);
 	const workbenchConfig = vscode.workspace.getConfiguration('workbench');
 
-	const existingColors =
-		workbenchConfig.get<Record<string, string>>('colorCustomizations') ?? {};
+	const existingColors = workbenchConfig.get<Record<string, string>>('colorCustomizations') ?? {};
 	const mergedColors = { ...existingColors, ...colors };
 
 	await workbenchConfig.update(
@@ -184,8 +183,7 @@ export async function applyColors(baseColor: string, config: ColorConfig): Promi
  */
 export async function resetColors(): Promise<void> {
 	const workbenchConfig = vscode.workspace.getConfiguration('workbench');
-	const existingColors =
-		workbenchConfig.get<Record<string, string>>('colorCustomizations') ?? {};
+	const existingColors = workbenchConfig.get<Record<string, string>>('colorCustomizations') ?? {};
 
 	const filteredColors = Object.fromEntries(
 		Object.entries(existingColors).filter(

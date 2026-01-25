@@ -1,0 +1,100 @@
+{
+  "name": "worktree-colors",
+  "displayName": "Worktree Colors",
+  "description": "Auto-assign colors to workspaces - git worktrees get related shades",
+  "version": "0.1.0",
+  "publisher": "worktree-colors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user/vscode-wt"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Themes"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "worktreeColors.applyColor",
+        "title": "Worktree Colors: Apply"
+      },
+      {
+        "command": "worktreeColors.resetColor",
+        "title": "Worktree Colors: Reset"
+      },
+      {
+        "command": "worktreeColors.showInfo",
+        "title": "Worktree Colors: Show Info"
+      }
+    ],
+    "configuration": {
+      "title": "Worktree Colors",
+      "properties": {
+        "worktreeColors.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-apply colors on workspace open"
+        },
+        "worktreeColors.affectTitleBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Apply color to title bar"
+        },
+        "worktreeColors.affectActivityBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Apply color to activity bar"
+        },
+        "worktreeColors.affectStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Apply color to status bar"
+        },
+        "worktreeColors.saturation": {
+          "type": "number",
+          "default": 50,
+          "minimum": 10,
+          "maximum": 100,
+          "description": "Color saturation (10-100)"
+        },
+        "worktreeColors.baseLightness": {
+          "type": "number",
+          "default": 35,
+          "minimum": 15,
+          "maximum": 60,
+          "description": "Base lightness for main worktree (15-60)"
+        },
+        "worktreeColors.worktreeLightnessStep": {
+          "type": "number",
+          "default": 8,
+          "minimum": 3,
+          "maximum": 15,
+          "description": "Lightness increase per worktree (3-15)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "check": "biome check --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}

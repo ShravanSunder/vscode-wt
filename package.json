@@ -3,7 +3,7 @@
   "displayName": "Worktree Colors",
   "description": "Auto-assign colors to workspaces - git worktrees get related shades",
   "version": "0.1.0",
-  "publisher": "shravan",
+  "publisher": "shravans",
   "license": "MIT",
   "icon": "images/icon.png",
   "repository": {

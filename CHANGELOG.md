@@ -7,8 +7,10 @@ All notable changes to "Worktree Colors" will be documented in this file.
 ### Added
 
 - **Multi-root workspace support**: For workspaces with multiple folders, the extension now checks if the `.code-workspace` file is inside a worktree first
-- **New setting `workspaceDetection`**: Choose between `"workspaceFile"` (default) to check workspace file location first, or `"firstFolder"` to always use the first folder
-- **New setting `folderFallback`**: Controls behavior when workspace file is not in a worktree - `"first"` (default) uses first folder, `"none"` skips coloring
+- **New setting `detectionMode`**: Controls worktree detection in multi-root workspaces
+  - `"auto"` (default): Check workspace file location first, fall back to first folder
+  - `"workspaceFileOnly"`: Only color if workspace file is inside a worktree
+  - `"firstFolderOnly"`: Always use first workspace folder
 - **New setting `respectExistingColors`**: When enabled (default), the extension won't override existing color customizations set by the user
 
 ### Changed

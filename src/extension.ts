@@ -8,9 +8,10 @@ import {
 } from './colors.js';
 import { type GitInfo, getGitInfo, getGitInfoForFile } from './git.js';
 
+type DetectionMode = 'auto' | 'workspaceFileOnly' | 'firstFolderOnly';
+
 interface WorkspaceConfig {
-	workspaceDetection: 'workspaceFile' | 'firstFolder';
-	folderFallback: 'first' | 'none';
+	detectionMode: DetectionMode;
 	respectExistingColors: boolean;
 }
 
@@ -20,9 +21,7 @@ interface WorkspaceConfig {
 function getWorkspaceConfig(): WorkspaceConfig {
 	const config = vscode.workspace.getConfiguration('worktreeColors');
 	return {
-		workspaceDetection:
-			config.get<'workspaceFile' | 'firstFolder'>('workspaceDetection') ?? 'workspaceFile',
-		folderFallback: config.get<'first' | 'none'>('folderFallback') ?? 'first',
+		detectionMode: config.get<DetectionMode>('detectionMode') ?? 'auto',
 		respectExistingColors: config.get<boolean>('respectExistingColors') ?? true,
 	};
 }
@@ -51,28 +50,26 @@ async function detectWorktreeGitInfo(wsConfig: WorkspaceConfig): Promise<GitInfo
 	const workspaceFilePath = getWorkspaceFilePath();
 	const firstFolderPath = getWorkspacePath();
 
-	// If using workspaceFile detection and we have a workspace file
-	if (wsConfig.workspaceDetection === 'workspaceFile' && workspaceFilePath) {
-		// Check if workspace file is inside a worktree
-		const workspaceFileGitInfo = await getGitInfoForFile(workspaceFilePath);
+	// firstFolderOnly: Always use first folder, ignore workspace file
+	if (wsConfig.detectionMode === 'firstFolderOnly') {
+		return firstFolderPath ? getGitInfo(firstFolderPath) : null;
+	}
 
+	// auto or workspaceFileOnly: Check workspace file location first
+	if (workspaceFilePath) {
+		const workspaceFileGitInfo = await getGitInfoForFile(workspaceFilePath);
 		if (workspaceFileGitInfo) {
 			return workspaceFileGitInfo;
 		}
-
-		// Workspace file is not in a git repo - apply fallback
-		if (wsConfig.folderFallback === 'none') {
-			return null;
-		}
-		// Fall through to first folder detection
 	}
 
-	// Use first folder for detection
-	if (!firstFolderPath) {
+	// workspaceFileOnly: Don't fall back to folder
+	if (wsConfig.detectionMode === 'workspaceFileOnly') {
 		return null;
 	}
 
-	return getGitInfo(firstFolderPath);
+	// auto: Fall back to first folder
+	return firstFolderPath ? getGitInfo(firstFolderPath) : null;
 }
 
 /**

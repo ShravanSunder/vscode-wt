@@ -99,25 +99,16 @@
           "maximum": 15,
           "description": "Lightness increase per worktree (2-15)"
         },
-        "worktreeColors.workspaceDetection": {
+        "worktreeColors.detectionMode": {
           "type": "string",
-          "enum": ["workspaceFile", "firstFolder"],
-          "default": "workspaceFile",
+          "enum": ["auto", "workspaceFileOnly", "firstFolderOnly"],
+          "default": "auto",
           "enumDescriptions": [
-            "Check if the .code-workspace file is inside a worktree first, then fall back to folder detection",
-            "Always use the first workspace folder for detection"
+            "Check workspace file location first, fall back to first folder (recommended)",
+            "Only color if workspace file is inside a worktree",
+            "Always use first workspace folder, ignore workspace file location"
           ],
           "description": "How to detect worktrees in multi-root workspaces"
-        },
-        "worktreeColors.folderFallback": {
-          "type": "string",
-          "enum": ["first", "none"],
-          "default": "first",
-          "enumDescriptions": [
-            "Use the first workspace folder if workspace file is not in a worktree",
-            "Don't apply colors if workspace file is not in a worktree"
-          ],
-          "description": "Fallback behavior when workspace file is not inside a worktree"
         },
         "worktreeColors.respectExistingColors": {
           "type": "boolean",

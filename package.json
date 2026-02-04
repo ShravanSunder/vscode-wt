@@ -101,10 +101,10 @@
         },
         "worktreeColors.detectionMode": {
           "type": "string",
-          "enum": ["auto", "workspaceFileOnly", "firstFolderOnly"],
+          "enum": ["auto", "workspaceFileOnly", "firstWorkspaceFolder"],
           "default": "auto",
           "enumDescriptions": [
-            "Check workspace file location first, fall back to first folder (recommended)",
+            "Check workspace file location first, fall back to first workspace folder (recommended)",
             "Only color if workspace file is inside a worktree",
             "Always use first workspace folder, ignore workspace file location"
           ],

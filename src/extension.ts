@@ -8,7 +8,7 @@ import {
 } from './colors.js';
 import { type GitInfo, getGitInfo, getGitInfoForFile } from './git.js';
 
-type DetectionMode = 'auto' | 'workspaceFileOnly' | 'firstFolderOnly';
+type DetectionMode = 'auto' | 'workspaceFileOnly' | 'firstWorkspaceFolder';
 
 interface WorkspaceConfig {
 	detectionMode: DetectionMode;
@@ -50,8 +50,8 @@ async function detectWorktreeGitInfo(wsConfig: WorkspaceConfig): Promise<GitInfo
 	const workspaceFilePath = getWorkspaceFilePath();
 	const firstFolderPath = getWorkspacePath();
 
-	// firstFolderOnly: Always use first folder, ignore workspace file
-	if (wsConfig.detectionMode === 'firstFolderOnly') {
+	// firstWorkspaceFolder: Always use first folder, ignore workspace file
+	if (wsConfig.detectionMode === 'firstWorkspaceFolder') {
 		return firstFolderPath ? getGitInfo(firstFolderPath) : null;
 	}
 

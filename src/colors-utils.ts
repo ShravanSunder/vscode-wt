@@ -110,22 +110,50 @@ export function addAlpha(hexColor: string, alpha: number): string {
 }
 
 /**
+ * Curated palette of 20 subtle, dark colors that work well with dark themes.
+ * Each color is designed to be muted and non-distracting while still distinguishable.
+ * Format: [baseHex, lighterHex] - base for worktree 1, lighter for worktree 2+
+ */
+const SUBTLE_PALETTE: Array<[string, string]> = [
+	['#2d3748', '#3d4a5c'], // slate blue
+	['#2d3b36', '#3d4e47'], // forest green
+	['#382d3b', '#4a3d4e'], // deep purple
+	['#3b2d2d', '#4e3d3d'], // burgundy
+	['#2d3038', '#3d424e'], // steel gray-blue
+	['#38362d', '#4a483d'], // olive brown
+	['#2d3835', '#3d4a47'], // teal gray
+	['#352d38', '#473d4a'], // violet gray
+	['#382d32', '#4a3d44'], // mauve
+	['#2d3533', '#3d4745'], // sage
+	['#33302d', '#45423d'], // warm gray
+	['#2d3338', '#3d454a'], // cool blue-gray
+	['#38332d', '#4a453d'], // tan brown
+	['#2d3538', '#3d474a'], // sea gray
+	['#352d33', '#473d45'], // dusty rose
+	['#303830', '#424a42'], // moss
+	['#302d38', '#423d4a'], // indigo gray
+	['#38302d', '#4a423d'], // rust brown
+	['#2d3830', '#3d4a42'], // pine
+	['#332d35', '#453d47'], // plum gray
+];
+
+/**
  * Generate a color based on repository identifier and worktree index
+ * Uses a curated palette of subtle colors for consistent appearance
  */
 export function generateColor(
 	repoIdentifier: string,
 	worktreeIndex: number,
-	config: ColorConfig
+	_config: ColorConfig
 ): string {
-	const hue = stringToHue(repoIdentifier);
-	const { saturation, baseLightness, worktreeLightnessStep } = config;
+	// Use hash to pick a color from the palette
+	const hash = stringToHue(repoIdentifier);
+	const paletteIndex = hash % SUBTLE_PALETTE.length;
+	const baseColor = SUBTLE_PALETTE[paletteIndex]?.[0] ?? '#2d3748';
+	const lighterColor = SUBTLE_PALETTE[paletteIndex]?.[1] ?? '#3d4a5c';
 
-	// Main worktree (index 0) gets base lightness
-	// Each subsequent worktree gets progressively lighter
-	// Cap lightness at 30% to keep colors dark and subtle (like Peacock's darken mode)
-	const lightness = Math.min(baseLightness + worktreeIndex * worktreeLightnessStep, 30);
-
-	return hslToHex(hue, saturation, lightness);
+	// Worktree index 1 gets base color, 2+ gets lighter variant
+	return worktreeIndex <= 1 ? baseColor : lighterColor;
 }
 
 /**

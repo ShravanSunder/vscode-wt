@@ -188,3 +188,21 @@ export async function isGitRepository(workspacePath: string): Promise<boolean> {
 	const result = await execGit('rev-parse --is-inside-work-tree', workspacePath);
 	return result?.stdout.trim() === 'true';
 }
+
+/**
+ * Get git info for a file path by finding the containing git repository.
+ * Walks up the directory tree to find the git root.
+ */
+export async function getGitInfoForFile(filePath: string): Promise<GitInfo | null> {
+	// Get the directory containing the file
+	const dirPath = fs.statSync(filePath).isDirectory() ? filePath : path.dirname(filePath);
+
+	// Use git to find the repository root from this location
+	const result = await execGit('rev-parse --show-toplevel', dirPath);
+	if (!result) {
+		return null;
+	}
+
+	const repoRoot = result.stdout.trim();
+	return getGitInfo(repoRoot);
+}

@@ -1,6 +1,31 @@
 import * as vscode from 'vscode';
-import { applyColors, generateColor, getColorConfig, resetColors } from './colors.js';
-import { getGitInfo } from './git.js';
+import {
+	applyColors,
+	generateColor,
+	getColorConfig,
+	hasExistingManagedColors,
+	resetColors,
+} from './colors.js';
+import { type GitInfo, getGitInfo, getGitInfoForFile } from './git.js';
+
+interface WorkspaceConfig {
+	workspaceDetection: 'workspaceFile' | 'firstFolder';
+	folderFallback: 'first' | 'none';
+	respectExistingColors: boolean;
+}
+
+/**
+ * Get workspace configuration for worktree detection
+ */
+function getWorkspaceConfig(): WorkspaceConfig {
+	const config = vscode.workspace.getConfiguration('worktreeColors');
+	return {
+		workspaceDetection:
+			config.get<'workspaceFile' | 'firstFolder'>('workspaceDetection') ?? 'workspaceFile',
+		folderFallback: config.get<'first' | 'none'>('folderFallback') ?? 'first',
+		respectExistingColors: config.get<boolean>('respectExistingColors') ?? true,
+	};
+}
 
 /**
  * Get the workspace folder path, if available
@@ -8,6 +33,46 @@ import { getGitInfo } from './git.js';
 function getWorkspacePath(): string | undefined {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	return workspaceFolders?.[0]?.uri.fsPath;
+}
+
+/**
+ * Get the workspace file path (for multi-root workspaces)
+ * Returns undefined for single-folder workspaces
+ */
+function getWorkspaceFilePath(): string | undefined {
+	return vscode.workspace.workspaceFile?.fsPath;
+}
+
+/**
+ * Detect the appropriate git info based on workspace configuration.
+ * For multi-root workspaces, can check if the .code-workspace file is inside a worktree.
+ */
+async function detectWorktreeGitInfo(wsConfig: WorkspaceConfig): Promise<GitInfo | null> {
+	const workspaceFilePath = getWorkspaceFilePath();
+	const firstFolderPath = getWorkspacePath();
+
+	// If using workspaceFile detection and we have a workspace file
+	if (wsConfig.workspaceDetection === 'workspaceFile' && workspaceFilePath) {
+		// Check if workspace file is inside a worktree
+		const workspaceFileGitInfo = await getGitInfoForFile(workspaceFilePath);
+
+		if (workspaceFileGitInfo) {
+			return workspaceFileGitInfo;
+		}
+
+		// Workspace file is not in a git repo - apply fallback
+		if (wsConfig.folderFallback === 'none') {
+			return null;
+		}
+		// Fall through to first folder detection
+	}
+
+	// Use first folder for detection
+	if (!firstFolderPath) {
+		return null;
+	}
+
+	return getGitInfo(firstFolderPath);
 }
 
 /**
@@ -19,9 +84,22 @@ async function applyWorktreeColors(): Promise<{ applied: boolean; message: strin
 		return { applied: false, message: 'No workspace folder open' };
 	}
 
-	const gitInfo = await getGitInfo(workspacePath);
+	const wsConfig = getWorkspaceConfig();
+
+	// Check if we should respect existing colors
+	if (wsConfig.respectExistingColors && hasExistingManagedColors()) {
+		return { applied: false, message: 'Existing color customizations found (not overriding)' };
+	}
+
+	const gitInfo = await detectWorktreeGitInfo(wsConfig);
 	if (!gitInfo) {
-		return { applied: false, message: 'Not a git repository' };
+		return { applied: false, message: 'Not a git repository or workspace file not in worktree' };
+	}
+
+	// Skip coloring for the root/main worktree (index 0)
+	// Only color secondary worktrees
+	if (gitInfo.worktreeIndex === 0) {
+		return { applied: false, message: 'Skipping root worktree (no color applied)' };
 	}
 
 	const config = getColorConfig();
@@ -29,10 +107,9 @@ async function applyWorktreeColors(): Promise<{ applied: boolean; message: strin
 
 	await applyColors(color, config);
 
-	const worktreeType = gitInfo.isWorktree ? 'worktree' : 'repository';
 	return {
 		applied: true,
-		message: `Applied color ${color} for ${worktreeType} (index ${gitInfo.worktreeIndex})`,
+		message: `Applied color ${color} for worktree (index ${gitInfo.worktreeIndex})`,
 	};
 }
 
@@ -115,6 +192,12 @@ export function activate(context: vscode.ExtensionContext): void {
 					const message = error instanceof Error ? error.message : 'Unknown error';
 					console.error('Failed to apply worktree colors on config change:', message);
 				});
+			} else {
+				// User disabled the extension - clean up colors
+				resetColors().catch((error: unknown) => {
+					const message = error instanceof Error ? error.message : 'Unknown error';
+					console.error('Failed to reset worktree colors:', message);
+				});
 			}
 		}
 	});
@@ -122,6 +205,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	context.subscriptions.push(configWatcher);
 }
 
-export function deactivate(): void {
-	// Cleanup if needed
+export function deactivate(): Thenable<void> | undefined {
+	// Clean up colors on deactivation to leave workspace settings clean
+	return resetColors();
 }

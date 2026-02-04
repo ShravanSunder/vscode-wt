@@ -147,22 +147,23 @@ describe('generateColor', () => {
 		expect(color1).toBe(color2);
 	});
 
-	it('should produce same hue but different lightness for different worktree indices', () => {
+	it('should use base color for index 0-1 and lighter color for index 2+', () => {
 		const color0 = generateColor('github.com/user/repo', 0, defaultConfig);
 		const color1 = generateColor('github.com/user/repo', 1, defaultConfig);
 		const color2 = generateColor('github.com/user/repo', 2, defaultConfig);
+		const color3 = generateColor('github.com/user/repo', 3, defaultConfig);
 
-		// All should be different colors
-		expect(color0).not.toBe(color1);
+		// Index 0 and 1 get the same base color from palette
+		expect(color0).toBe(color1);
+		// Index 2+ get the lighter variant
+		expect(color2).toBe(color3);
+		// Base and lighter should be different
 		expect(color1).not.toBe(color2);
 	});
 
-	it('should cap lightness at 65', () => {
-		// With baseLightness 35 and step 8, index 10 would give 35 + 80 = 115
-		// But it should be capped at 65
+	it('should return valid hex colors for high worktree indices', () => {
 		const color = generateColor('github.com/user/repo', 10, defaultConfig);
 		expect(color).toMatch(/^#[0-9a-f]{6}$/);
-		// The color should still be valid (not error out)
 	});
 });
 

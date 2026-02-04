@@ -2,8 +2,8 @@
   "name": "worktree-colors",
   "displayName": "Worktree Colors",
   "description": "Auto-assign colors to workspaces - git worktrees get related shades",
-  "version": "0.1.0",
-  "publisher": "shravan",
+  "version": "0.4.0",
+  "publisher": "shravans",
   "license": "MIT",
   "icon": "images/icon.png",
   "repository": {
@@ -80,24 +80,49 @@
         },
         "worktreeColors.saturation": {
           "type": "number",
-          "default": 50,
+          "default": 15,
           "minimum": 10,
           "maximum": 100,
           "description": "Color saturation (10-100)"
         },
         "worktreeColors.baseLightness": {
           "type": "number",
-          "default": 35,
+          "default": 20,
           "minimum": 15,
           "maximum": 60,
-          "description": "Base lightness for main worktree (15-60)"
+          "description": "Base lightness for first worktree (15-60)"
         },
         "worktreeColors.worktreeLightnessStep": {
           "type": "number",
-          "default": 8,
-          "minimum": 3,
+          "default": 4,
+          "minimum": 2,
           "maximum": 15,
-          "description": "Lightness increase per worktree (3-15)"
+          "description": "Lightness increase per worktree (2-15)"
+        },
+        "worktreeColors.workspaceDetection": {
+          "type": "string",
+          "enum": ["workspaceFile", "firstFolder"],
+          "default": "workspaceFile",
+          "enumDescriptions": [
+            "Check if the .code-workspace file is inside a worktree first, then fall back to folder detection",
+            "Always use the first workspace folder for detection"
+          ],
+          "description": "How to detect worktrees in multi-root workspaces"
+        },
+        "worktreeColors.folderFallback": {
+          "type": "string",
+          "enum": ["first", "none"],
+          "default": "first",
+          "enumDescriptions": [
+            "Use the first workspace folder if workspace file is not in a worktree",
+            "Don't apply colors if workspace file is not in a worktree"
+          ],
+          "description": "Fallback behavior when workspace file is not inside a worktree"
+        },
+        "worktreeColors.respectExistingColors": {
+          "type": "boolean",
+          "default": true,
+          "description": "Don't override existing color customizations (if user has set colors manually)"
         }
       }
     }

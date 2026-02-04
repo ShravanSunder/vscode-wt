@@ -1,6 +1,30 @@
 import * as vscode from 'vscode';
-import { applyColors, generateColor, getColorConfig, resetColors } from './colors.js';
-import { getGitInfo } from './git.js';
+import {
+	applyColors,
+	generateColor,
+	getColorConfig,
+	hasExistingManagedColors,
+	resetColors,
+} from './colors.js';
+import { type GitInfo, getGitInfo, getGitInfoForFile } from './git.js';
+
+type DetectionMode = 'auto' | 'workspaceFileOnly' | 'firstWorkspaceFolder';
+
+interface WorkspaceConfig {
+	detectionMode: DetectionMode;
+	respectExistingColors: boolean;
+}
+
+/**
+ * Get workspace configuration for worktree detection
+ */
+function getWorkspaceConfig(): WorkspaceConfig {
+	const config = vscode.workspace.getConfiguration('worktreeColors');
+	return {
+		detectionMode: config.get<DetectionMode>('detectionMode') ?? 'auto',
+		respectExistingColors: config.get<boolean>('respectExistingColors') ?? true,
+	};
+}
 
 /**
  * Get the workspace folder path, if available
@@ -8,6 +32,44 @@ import { getGitInfo } from './git.js';
 function getWorkspacePath(): string | undefined {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	return workspaceFolders?.[0]?.uri.fsPath;
+}
+
+/**
+ * Get the workspace file path (for multi-root workspaces)
+ * Returns undefined for single-folder workspaces
+ */
+function getWorkspaceFilePath(): string | undefined {
+	return vscode.workspace.workspaceFile?.fsPath;
+}
+
+/**
+ * Detect the appropriate git info based on workspace configuration.
+ * For multi-root workspaces, can check if the .code-workspace file is inside a worktree.
+ */
+async function detectWorktreeGitInfo(wsConfig: WorkspaceConfig): Promise<GitInfo | null> {
+	const workspaceFilePath = getWorkspaceFilePath();
+	const firstFolderPath = getWorkspacePath();
+
+	// firstWorkspaceFolder: Always use first folder, ignore workspace file
+	if (wsConfig.detectionMode === 'firstWorkspaceFolder') {
+		return firstFolderPath ? getGitInfo(firstFolderPath) : null;
+	}
+
+	// auto or workspaceFileOnly: Check workspace file location first
+	if (workspaceFilePath) {
+		const workspaceFileGitInfo = await getGitInfoForFile(workspaceFilePath);
+		if (workspaceFileGitInfo) {
+			return workspaceFileGitInfo;
+		}
+	}
+
+	// workspaceFileOnly: Don't fall back to folder
+	if (wsConfig.detectionMode === 'workspaceFileOnly') {
+		return null;
+	}
+
+	// auto: Fall back to first folder
+	return firstFolderPath ? getGitInfo(firstFolderPath) : null;
 }
 
 /**
@@ -19,9 +81,22 @@ async function applyWorktreeColors(): Promise<{ applied: boolean; message: strin
 		return { applied: false, message: 'No workspace folder open' };
 	}
 
-	const gitInfo = await getGitInfo(workspacePath);
+	const wsConfig = getWorkspaceConfig();
+
+	// Check if we should respect existing colors
+	if (wsConfig.respectExistingColors && hasExistingManagedColors()) {
+		return { applied: false, message: 'Existing color customizations found (not overriding)' };
+	}
+
+	const gitInfo = await detectWorktreeGitInfo(wsConfig);
 	if (!gitInfo) {
-		return { applied: false, message: 'Not a git repository' };
+		return { applied: false, message: 'Not a git repository or workspace file not in worktree' };
+	}
+
+	// Skip coloring for the root/main worktree (index 0)
+	// Only color secondary worktrees
+	if (gitInfo.worktreeIndex === 0) {
+		return { applied: false, message: 'Skipping root worktree (no color applied)' };
 	}
 
 	// Skip coloring for the root/main worktree (index 0)

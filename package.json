@@ -2,7 +2,7 @@
   "name": "worktree-colors",
   "displayName": "Worktree Colors",
   "description": "Auto-assign colors to workspaces - git worktrees get related shades",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "shravans",
   "license": "MIT",
   "icon": "images/icon.png",
@@ -98,6 +98,22 @@
           "minimum": 2,
           "maximum": 15,
           "description": "Lightness increase per worktree (2-15)"
+        },
+        "worktreeColors.detectionMode": {
+          "type": "string",
+          "enum": ["auto", "workspaceFileOnly", "firstWorkspaceFolder"],
+          "default": "auto",
+          "enumDescriptions": [
+            "Check workspace file location first, fall back to first workspace folder (recommended)",
+            "Only color if workspace file is inside a worktree",
+            "Always use first workspace folder, ignore workspace file location"
+          ],
+          "description": "How to detect worktrees in multi-root workspaces"
+        },
+        "worktreeColors.respectExistingColors": {
+          "type": "boolean",
+          "default": true,
+          "description": "Don't override existing color customizations (if user has set colors manually)"
         }
       }
     }

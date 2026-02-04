@@ -120,6 +120,12 @@ export function activate(context: vscode.ExtensionContext): void {
 					const message = error instanceof Error ? error.message : 'Unknown error';
 					console.error('Failed to apply worktree colors on config change:', message);
 				});
+			} else {
+				// User disabled the extension - clean up colors
+				resetColors().catch((error: unknown) => {
+					const message = error instanceof Error ? error.message : 'Unknown error';
+					console.error('Failed to reset worktree colors:', message);
+				});
 			}
 		}
 	});
@@ -127,6 +133,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	context.subscriptions.push(configWatcher);
 }
 
-export function deactivate(): void {
-	// Cleanup if needed
+export function deactivate(): Thenable<void> | undefined {
+	// Clean up colors on deactivation to leave workspace settings clean
+	return resetColors();
 }

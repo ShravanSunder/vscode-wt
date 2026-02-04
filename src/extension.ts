@@ -93,16 +93,10 @@ async function applyWorktreeColors(): Promise<{ applied: boolean; message: strin
 		return { applied: false, message: 'Not a git repository or workspace file not in worktree' };
 	}
 
-	// Skip coloring for the root/main worktree (index 0)
-	// Only color secondary worktrees
-	if (gitInfo.worktreeIndex === 0) {
-		return { applied: false, message: 'Skipping root worktree (no color applied)' };
-	}
-
-	// Skip coloring for the root/main worktree (index 0)
-	// Only color secondary worktrees
-	if (gitInfo.worktreeIndex === 0) {
-		return { applied: false, message: 'Skipping root worktree (no color applied)' };
+	// Skip coloring for the main repository (not a worktree)
+	// Only color actual worktrees (where .git is a file, not a directory)
+	if (!gitInfo.isWorktree) {
+		return { applied: false, message: 'Skipping main repository (no color applied)' };
 	}
 
 	const config = getColorConfig();

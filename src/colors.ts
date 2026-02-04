@@ -121,9 +121,9 @@ export function getColorConfig(): ColorConfig {
 	const config = vscode.workspace.getConfiguration('worktreeColors');
 
 	return {
-		saturation: config.get<number>('saturation') ?? 30,
-		baseLightness: config.get<number>('baseLightness') ?? 25,
-		worktreeLightnessStep: config.get<number>('worktreeLightnessStep') ?? 5,
+		saturation: config.get<number>('saturation') ?? 15,
+		baseLightness: config.get<number>('baseLightness') ?? 20,
+		worktreeLightnessStep: config.get<number>('worktreeLightnessStep') ?? 4,
 		affectTitleBar: config.get<boolean>('affectTitleBar') ?? true,
 		affectActivityBar: config.get<boolean>('affectActivityBar') ?? true,
 		affectStatusBar: config.get<boolean>('affectStatusBar') ?? true,

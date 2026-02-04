@@ -122,7 +122,8 @@ export function generateColor(
 
 	// Main worktree (index 0) gets base lightness
 	// Each subsequent worktree gets progressively lighter
-	const lightness = Math.min(baseLightness + worktreeIndex * worktreeLightnessStep, 65);
+	// Cap lightness at 30% to keep colors dark and subtle (like Peacock's darken mode)
+	const lightness = Math.min(baseLightness + worktreeIndex * worktreeLightnessStep, 30);
 
 	return hslToHex(hue, saturation, lightness);
 }

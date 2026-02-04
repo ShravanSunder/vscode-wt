@@ -2,7 +2,7 @@
   "name": "worktree-colors",
   "displayName": "Worktree Colors",
   "description": "Auto-assign colors to workspaces - git worktrees get related shades",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "shravans",
   "license": "MIT",
   "icon": "images/icon.png",
@@ -80,24 +80,24 @@
         },
         "worktreeColors.saturation": {
           "type": "number",
-          "default": 30,
+          "default": 15,
           "minimum": 10,
           "maximum": 100,
           "description": "Color saturation (10-100)"
         },
         "worktreeColors.baseLightness": {
           "type": "number",
-          "default": 25,
+          "default": 20,
           "minimum": 15,
           "maximum": 60,
           "description": "Base lightness for first worktree (15-60)"
         },
         "worktreeColors.worktreeLightnessStep": {
           "type": "number",
-          "default": 5,
-          "minimum": 3,
+          "default": 4,
+          "minimum": 2,
           "maximum": 15,
-          "description": "Lightness increase per worktree (3-15)"
+          "description": "Lightness increase per worktree (2-15)"
         }
       }
     }

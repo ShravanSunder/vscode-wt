@@ -99,6 +99,12 @@ async function applyWorktreeColors(): Promise<{ applied: boolean; message: strin
 		return { applied: false, message: 'Skipping root worktree (no color applied)' };
 	}
 
+	// Skip coloring for the root/main worktree (index 0)
+	// Only color secondary worktrees
+	if (gitInfo.worktreeIndex === 0) {
+		return { applied: false, message: 'Skipping root worktree (no color applied)' };
+	}
+
 	const config = getColorConfig();
 	const color = generateColor(gitInfo.repoIdentifier, gitInfo.worktreeIndex, config);
 

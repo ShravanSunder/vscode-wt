@@ -8,6 +8,8 @@ All notable changes to "Worktree Colors" will be documented in this file.
 
 - **Worktree detection**: Use `isWorktree` flag instead of alphabetical index to correctly identify worktrees
 - Previously, worktrees could be skipped if their folder name was alphabetically first
+- **Existing colors check**: Only check workspace-level settings, not user/global settings
+- Previously, having any title bar colors in user settings would block worktree coloring
 
 ### Changed
 

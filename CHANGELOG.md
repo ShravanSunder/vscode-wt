@@ -2,6 +2,17 @@
 
 All notable changes to "Worktree Colors" will be documented in this file.
 
+## [0.4.1] - 2025-02-05
+
+### Fixed
+
+- **Worktree detection**: Use `isWorktree` flag instead of alphabetical index to correctly identify worktrees
+- Previously, worktrees could be skipped if their folder name was alphabetically first
+
+### Changed
+
+- **Improved Show Info command**: Now shows detailed debug information including detection mode, existing colors status, and why coloring might be skipped
+
 ## [0.4.0] - 2025-02-04
 
 ### Added

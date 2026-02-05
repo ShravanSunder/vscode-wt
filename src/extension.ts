@@ -120,24 +120,40 @@ async function showWorktreeInfo(): Promise<void> {
 		return;
 	}
 
+	const wsConfig = getWorkspaceConfig();
 	const gitInfo = await getGitInfo(workspacePath);
+
 	if (!gitInfo) {
-		await vscode.window.showInformationMessage('Not a git repository');
+		await vscode.window.showInformationMessage(`Not a git repository\nPath: ${workspacePath}`);
 		return;
 	}
 
 	const config = getColorConfig();
 	const color = generateColor(gitInfo.repoIdentifier, gitInfo.worktreeIndex, config);
+	const hasExisting = hasExistingManagedColors();
 
 	const lines = [
 		`Repository: ${gitInfo.repoIdentifier}`,
-		`Type: ${gitInfo.isWorktree ? 'Worktree' : 'Main Repository'}`,
+		`Is Worktree: ${gitInfo.isWorktree}`,
 		`Worktree Index: ${gitInfo.worktreeIndex}`,
 		`Generated Color: ${color}`,
+		`Has Existing Colors: ${hasExisting}`,
+		`Respect Existing: ${wsConfig.respectExistingColors}`,
+		`Detection Mode: ${wsConfig.detectionMode}`,
+		`Path: ${workspacePath}`,
 	];
 
 	if (gitInfo.isWorktree && gitInfo.mainWorktreePath) {
 		lines.push(`Main Repo Path: ${gitInfo.mainWorktreePath}`);
+	}
+
+	// Show why coloring might be skipped
+	if (!gitInfo.isWorktree) {
+		lines.push('\n[SKIP] This is the main repo, not a worktree');
+	} else if (hasExisting && wsConfig.respectExistingColors) {
+		lines.push('\n[SKIP] Existing colors found and respectExistingColors is true');
+	} else {
+		lines.push('\n[OK] Should be colored');
 	}
 
 	await vscode.window.showInformationMessage(lines.join('\n'), { modal: true });

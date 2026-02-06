@@ -2,7 +2,7 @@
 
 All notable changes to "Worktree Colors" will be documented in this file.
 
-## [0.4.2] - 2025-02-05
+## [0.4.3] - 2025-02-05
 
 ### Fixed
 

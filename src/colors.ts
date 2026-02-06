@@ -117,7 +117,8 @@ export function hasAppliedColors(): boolean {
 /**
  * Check if any of the managed color keys already have values set in WORKSPACE settings
  * (not by this extension). This is used to respect existing color customizations.
- * Only checks workspace-level settings, not user/global settings.
+ * Only checks workspace-level settings (.vscode/settings.json or .code-workspace),
+ * not user/global settings.
  */
 export function hasExistingManagedColors(): boolean {
 	// If we've already applied colors, those are ours - don't count them
@@ -129,10 +130,21 @@ export function hasExistingManagedColors(): boolean {
 
 	// Use inspect() to get only workspace-level settings, not merged config
 	const inspection = workbenchConfig.inspect<Record<string, string>>('colorCustomizations');
-	const workspaceColors = inspection?.workspaceValue ?? {};
 
-	// Check if any of our managed keys have values at workspace level
-	return MANAGED_COLOR_KEYS.some((key) => workspaceColors[key] !== undefined);
+	// Check workspace settings (.vscode/settings.json for single folder, or .code-workspace file)
+	const workspaceColors = inspection?.workspaceValue;
+
+	// Check workspace folder settings (for multi-root workspaces, folder-specific settings)
+	const folderColors = inspection?.workspaceFolderValue;
+
+	// Only consider colors that exist at workspace or folder level, NOT global/user
+	const hasWorkspaceColors =
+		workspaceColors !== undefined &&
+		MANAGED_COLOR_KEYS.some((key) => workspaceColors[key] !== undefined);
+	const hasFolderColors =
+		folderColors !== undefined && MANAGED_COLOR_KEYS.some((key) => folderColors[key] !== undefined);
+
+	return hasWorkspaceColors || hasFolderColors;
 }
 
 /**

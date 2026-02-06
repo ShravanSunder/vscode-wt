@@ -2,11 +2,12 @@
 
 All notable changes to "Worktree Colors" will be documented in this file.
 
-## [0.4.2] - 2025-02-05
+## [0.4.3] - 2025-02-05
 
 ### Fixed
 
-- **Debug existing colors detection**: Added detailed debug output to Show Info command showing exactly what workspace and folder configuration values are being detected
+- **Existing colors detection**: Now checks both `workspaceValue` and `workspaceFolderValue` from VS Code config, not just `workspaceValue`. Only workspace-level settings (`.vscode/settings.json` or `.code-workspace`) are considered, never global/user settings.
+- **Debug output**: Show Info command displays exactly what workspace and folder configuration values are being detected
 
 ## [0.4.1] - 2025-02-05
 

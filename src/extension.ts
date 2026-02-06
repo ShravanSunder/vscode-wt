@@ -132,26 +132,28 @@ async function showWorktreeInfo(): Promise<void> {
 	const color = generateColor(gitInfo.repoIdentifier, gitInfo.worktreeIndex, config);
 	const hasExisting = hasExistingManagedColors();
 
+	// Debug: inspect the actual color config
+	const workbenchConfig = vscode.workspace.getConfiguration('workbench');
+	const inspection = workbenchConfig.inspect<Record<string, string>>('colorCustomizations');
+	const wsColors = inspection?.workspaceValue;
+	const wsFolderColors = inspection?.workspaceFolderValue;
+
 	const lines = [
 		`Repository: ${gitInfo.repoIdentifier}`,
 		`Is Worktree: ${gitInfo.isWorktree}`,
-		`Worktree Index: ${gitInfo.worktreeIndex}`,
 		`Generated Color: ${color}`,
 		`Has Existing Colors: ${hasExisting}`,
-		`Respect Existing: ${wsConfig.respectExistingColors}`,
-		`Detection Mode: ${wsConfig.detectionMode}`,
-		`Path: ${workspacePath}`,
+		'',
+		'DEBUG:',
+		`  workspaceValue: ${wsColors ? JSON.stringify(Object.keys(wsColors)) : 'undefined'}`,
+		`  workspaceFolderValue: ${wsFolderColors ? JSON.stringify(Object.keys(wsFolderColors)) : 'undefined'}`,
 	];
-
-	if (gitInfo.isWorktree && gitInfo.mainWorktreePath) {
-		lines.push(`Main Repo Path: ${gitInfo.mainWorktreePath}`);
-	}
 
 	// Show why coloring might be skipped
 	if (!gitInfo.isWorktree) {
-		lines.push('\n[SKIP] This is the main repo, not a worktree');
+		lines.push('\n[SKIP] Main repo, not a worktree');
 	} else if (hasExisting && wsConfig.respectExistingColors) {
-		lines.push('\n[SKIP] Existing colors found and respectExistingColors is true');
+		lines.push('\n[SKIP] Existing colors found');
 	} else {
 		lines.push('\n[OK] Should be colored');
 	}

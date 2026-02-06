@@ -2,6 +2,12 @@
 
 All notable changes to "Worktree Colors" will be documented in this file.
 
+## [0.4.2] - 2025-02-05
+
+### Fixed
+
+- **Debug existing colors detection**: Added detailed debug output to Show Info command showing exactly what workspace and folder configuration values are being detected
+
 ## [0.4.1] - 2025-02-05
 
 ### Fixed
